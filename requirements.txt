@@ -1,0 +1,12 @@
+tqdm==4.59.0
+matplotlib==3.3.4
+numpy==1.19.5
+seaborn==0.11.1
+sinabs==0.2.1.dev49
+wfdb==3.3.0
+torch==1.8.0+cu111
+tensorflow_gpu==2.4.1
+torchvision==0.9.0+cu111
+pywt==1.0.6
+scikit_learn==0.24.1
+tensorflow==2.4.1
