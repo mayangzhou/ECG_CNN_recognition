@@ -1,5 +1,6 @@
 import os
 import datetime
+from doctest import master
 
 import wfdb
 import pywt
@@ -8,6 +9,8 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix
+
+from spkeras.models import cnn_to_snn
 
 # 项目目录
 # D:\PythonFile\mit-bih_ecg_recognition
@@ -175,11 +178,16 @@ def main():
                   callbacks=[tensorboard_callback])
         model.save(filepath=model_path)
 
+
+
     # 预测
     Y_pred = model.predict_classes(X_test)
     # 绘制混淆矩阵
     plotHeatMap(Y_test, Y_pred)
 
+    snn_model = cnn_to_snn(signed_bit=0)(model, X_train)
+    Y_pred2 = snn_model.predict_classes(X_test)
+    plotHeatMap(Y_test, Y_pred2)
 
 if __name__ == '__main__':
     main()

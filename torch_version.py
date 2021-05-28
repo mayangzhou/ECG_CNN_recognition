@@ -217,7 +217,7 @@ def main():
     print(Y_train.shape)
 
     TrueDataSet = mydataloader(X_train, Y_train)
-    data_for_train = DataLoader(TrueDataSet, batch_size=128, shuffle=True, drop_last=False, num_workers=2)
+    data_for_train = DataLoader(TrueDataSet, batch_size=128, shuffle=True, drop_last=True, num_workers=2)
     if os.path.exists(model_path):
         # 导入训练好的模型
         model = torch.load(model_path)
@@ -295,19 +295,21 @@ def function_scnn():
         # model = torch.load(model_path)
         # print(model)
         model2 = transmodel(CNN().float().cuda(), input_shape=(1, 300), add_spiking_output=True, synops=True)
+        print(model2)
         optimizer = torch.optim.Adam(model2.parameters())
         criterion = nn.CrossEntropyLoss()
 
         for epoch in tqdm(range(3)):
             tmp_loss_in_epoch = 0
             for i, (data, label) in tqdm(enumerate(data_for_train)):
-                data = data.type(torch.FloatTensor).cuda()
-                label = label.cuda()
+                data2 = data.type(torch.FloatTensor).cuda()
+                label2 = label.cuda()
                 # GPU加速
 
                 optimizer.zero_grad()
-                output = model2(data)
-                loss = criterion(output, label.long())
+                output = model2(data2)
+                loss = criterion(output, label2.long())
+
                 loss.backward(retain_graph=True)
                 optimizer.step()
                 tmp_loss_in_epoch += loss.item()
@@ -328,6 +330,31 @@ def function_scnn():
     Y2 = [np.argmax(Y_pred[i]) for i in range(len(Y_pred))]
     plotHeatMap(Y_test, Y2)
 
+
+def test_scnn():
+    X_train, Y_train, X_test, Y_test = loadData()
+    X_train = torch.from_numpy(X_train)
+    Y_train = torch.from_numpy(Y_train)
+
+    X_test = torch.from_numpy(X_test)
+    X_test = X_test.type(torch.FloatTensor)
+
+    model = torch.load(model_path)
+    model2 = transmodel(model.float().cuda(), input_shape=(1, 300), add_spiking_output=True, synops=True)
+    model2.eval()
+    print("model2:")
+    print(model2)
+    with torch.no_grad():
+        Y_pred = model2.forward(X_test.cuda())
+    Y_pred = Y_pred.data.cpu().numpy()
+
+    Y2 = [np.argmax(Y_pred[i]) for i in range(len(Y_pred))]
+    plotHeatMap(Y_test, Y2)
+    acc_trans = [1 if Y2[i] == Y_test[i] else 0 for i in range(len(Y2))]
+    acc_rate = np.sum(acc_trans)/float(len(acc_trans))
+    print(acc_rate)
+
 if __name__ == '__main__':
-    function_scnn()
+    # function_scnn()
     # main()
+    test_scnn()
