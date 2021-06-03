@@ -4,6 +4,7 @@ from spiking_model import *
 root_path = "D:\\PythonFile\\ECG_CNN_Recognition"
 model_path = root_path + "\\ecg_model.pkl"
 snn_model_path = root_path + "\\snn_model.pkl"
+snn_model_path2 = root_path + "\\snn_model2.pkl"
 
 if __name__ == '__main__':
     # X_train,Y_train为所有的数据集和标签集
@@ -27,7 +28,7 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam(model.parameters())
         criterion = nn.CrossEntropyLoss()
 
-        for epoch in range(30):
+        for epoch in range(10):
             tmp_loss_in_epoch = 0
             for i, (data, label) in enumerate(data_for_train):
                 data = data.cuda()
